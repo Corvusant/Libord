@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Libord</string>
+    <string name="Libord">Libord</string>
+    <string name="add_word">Add Word</string>
+    <string name="pick_random_word">Pick Random Word</string>
+    <string name="add_new_word">Add New Word</string>
+    <string name="save">Save</string>
+    <string name="category">Category</string>
+    <string name="word">Word</string>
+</resources>
