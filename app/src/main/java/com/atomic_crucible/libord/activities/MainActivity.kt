@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.atomic_crucible.libord.Category
+import com.atomic_crucible.libord.JsonConverter
 import com.atomic_crucible.libord.R
 import com.atomic_crucible.libord.WordLibrary
 import com.atomic_crucible.libord.optional.*
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WordLibrary.load(this)
+        WordLibrary.load(this, JsonConverter)
         setContentView(R.layout.activity_main)
 
         categorySpinner = findViewById(R.id.spinnerCategory)
