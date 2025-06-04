@@ -31,7 +31,12 @@ class WordsAdapter(
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
         val word = words[position]
         holder.wordTextView.text = word.value
-        holder.categoryTextView.text = word.category.value
+        holder.categoryTextView.text = word.categories.fold("", {
+            acc, c -> when (acc){
+                "" -> c.value
+                else -> "$acc, ${c.value}"
+            }
+        })
         holder.deleteButton.setOnClickListener {
             WordLibrary.deleteWord(word, context)
             words.removeAt(position)
@@ -43,7 +48,7 @@ class WordsAdapter(
 
     fun updateWords(newWords: List<Word>) {
         words = newWords.toMutableList()
-            .sortedBy { w -> w.category.value }
+            .sortedBy { w -> w.categories.first().value }
             .toMutableList()
 
         notifyDataSetChanged()

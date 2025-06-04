@@ -75,15 +75,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun populateCategories() {
-        val categories = WordLibrary.getCategories().ifEmpty { listOf("None") }
+        val categories = WordLibrary.getCategories().map { it.value }.ifEmpty { listOf("None") }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         categorySpinner.adapter = adapter
 
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val currentCategory = categories[position]
-                WordLibrary.setLastSelectedCategory(Some(Category(currentCategory)))
+                val currentCategory = Category(categories[position])
+                WordLibrary.setLastSelectedCategory(Some(currentCategory))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

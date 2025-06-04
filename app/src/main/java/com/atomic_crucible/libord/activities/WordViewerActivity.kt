@@ -2,36 +2,37 @@ package com.atomic_crucible.libord.activities
 
 import android.app.Activity
 import android.content.Intent
-import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.atomic_crucible.libord.CATEGORY_ALL
 import com.atomic_crucible.libord.Category
 import com.atomic_crucible.libord.JsonConverter
 
 import com.atomic_crucible.libord.WordLibrary
 import com.atomic_crucible.libord.R
+import com.atomic_crucible.libord.Word
 import com.atomic_crucible.libord.activities.Components.WordsAdapter
 import com.atomic_crucible.libord.createFile
+import com.atomic_crucible.libord.openFile
 import com.atomic_crucible.libord.optional.*
-import java.io.File
+import com.google.gson.reflect.TypeToken
+import java.io.FileInputStream
 import java.io.FileOutputStream
 
 class WordViewerActivity : AppCompatActivity() {
-
 
     private lateinit var spinnerCategory: Spinner
     private lateinit var recyclerView: RecyclerView
     private lateinit var deleteAllButton: Button
     private lateinit var exportButton : Button
+    private lateinit var importButton : Button
     private lateinit var adapter: WordsAdapter
 
-    private var currentCategory: String = "All"
+    private var currentCategory: Category = CATEGORY_ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,16 +42,19 @@ class WordViewerActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerViewWords)
         deleteAllButton = findViewById(R.id.buttonDeleteAll)
         exportButton = findViewById(R.id.exportButton)
+        importButton = findViewById(R.id.importButton)
 
         setupCategorySpinner()
         setupRecyclerView()
 
         deleteAllButton.setOnClickListener {
-            if (currentCategory == "All") {
-                Toast.makeText(this, "Select a specific category to delete.", Toast.LENGTH_SHORT).show()
+            if (currentCategory == CATEGORY_ALL) {
+                WordLibrary.getCategories()
+                .forEach { WordLibrary.deleteAllInCategory(it,this) }
+                updateWordList(CATEGORY_ALL)
             } else {
-                WordLibrary.deleteAllInCategory(Category(currentCategory), this)
-                updateWordList(currentCategory)
+                WordLibrary.deleteAllInCategory(currentCategory, this)
+                updateWordList(CATEGORY_ALL)
                 Toast.makeText(this, "Deleted all words in $currentCategory", Toast.LENGTH_SHORT).show()
             }
         }
@@ -58,22 +62,43 @@ class WordViewerActivity : AppCompatActivity() {
         exportButton.setOnClickListener {
             createFile(this)
         }
+        importButton.setOnClickListener {
+            openFile(this)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK && requestCode == 1)
+        if (resultCode == Activity.RESULT_OK)
         {
-            data?.data?.also {
-                uri ->
-                    val words = WordLibrary.getAllWords();
-                    val json = JsonConverter.toJson(words)
 
-                    contentResolver.openFileDescriptor(uri,"w")?.use {
-                        FileOutputStream(it.fileDescriptor).use {
-                            it.write(json.toByteArray())
+            when(requestCode)
+            {
+                 1 -> data?.data?.also {
+                     uri ->
+                        val words = WordLibrary.getAllWords();
+                        val json = JsonConverter.toJson(words)
+
+                        contentResolver.openFileDescriptor(uri,"w")?.use {
+                            FileOutputStream(it.fileDescriptor).use {
+                                it.write(json.toByteArray())
+                            }
+                    }
+                }
+                2 -> data?.data?.also {
+                    uri->
+                    contentResolver.openFileDescriptor(uri,"r")?.use {
+                        FileInputStream(it.fileDescriptor).use {
+                            val json = it.bufferedReader().readText();
+                            val type = object : TypeToken<MutableList<Word>>() {}.type
+                            val words = JsonConverter.fromJson<List<Word>>(json, type)
+                            WordLibrary.loadNewWords(words.toList())
+                            updateWordList(CATEGORY_ALL)
                         }
                     }
+                }
+                else -> super.onActivityResult(requestCode, resultCode, data)
             }
+
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -84,16 +109,22 @@ class WordViewerActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        val categories = mutableListOf("All") + WordLibrary.getCategories()
+        val categories =
+            mutableListOf(CATEGORY_ALL.value) + WordLibrary.getCategories().map { it.value }
         val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = adapterSpinner
 
         spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                currentCategory = categories[position]
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                currentCategory = Category(categories[position])
                 updateWordList(currentCategory)
-                WordLibrary.setLastSelectedCategory(Some(Category(currentCategory)))
+                WordLibrary.setLastSelectedCategory(Some(currentCategory))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -102,22 +133,25 @@ class WordViewerActivity : AppCompatActivity() {
         }
 
         WordLibrary.onCategoryCleared = { removedCategory ->
-            Toast.makeText(this, "Last word in Category \"$removedCategory\" has been removed, removing Category", Toast.LENGTH_SHORT).show()
-            adapterSpinner.remove(removedCategory.value) }
+            when (removedCategory) {
+                CATEGORY_ALL -> adapterSpinner.clear()
+                else -> adapterSpinner.remove(removedCategory.value)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = WordsAdapter(mutableListOf(), this)
         recyclerView.adapter = adapter
-        updateWordList("All")
+        updateWordList(CATEGORY_ALL)
     }
 
-    private fun updateWordList(category: String) {
-        val words = if (category == "All") {
+    private fun updateWordList(category: Category) {
+        val words = if (category == CATEGORY_ALL) {
             WordLibrary.getAllWords()
         } else {
-            WordLibrary.getWordsByCategory(Category(category))
+            WordLibrary.getWordsByCategory(category)
         }
         adapter.updateWords(words)
     }

@@ -5,6 +5,8 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import com.atomic_crucible.libord.optional.*
 
+val CATEGORY_ALL = Category("All")
+
 object WordLibrary {
     private const val FILE_NAME = "words.json"
     private var words = mutableListOf<Word>()
@@ -17,13 +19,20 @@ object WordLibrary {
         if (file.exists()) {
             val json = file.readText()
             val type = object : TypeToken<MutableList<Word>>() {}.type
-            words = converter.fromJson(json, type) ?: mutableListOf()
+            val loadedWords : MutableList<Word> = converter.fromJson(json, type) ?: mutableListOf()
+            loadNewWords(loadedWords.toList())
             lastSelectedCategory = fromNullable(
-                words.map { w -> w.category }
+                words.map { w -> w.categories.first() }
                 .sortedBy{ c -> c.value }
                 .distinct()
                 .firstOrNull())
         }
+    }
+
+    fun loadNewWords(inWords: List<Word> ) : Unit
+    {
+        words = words.union(inWords)
+            .toMutableList()
     }
 
     fun save(context: Context, conveter: JsonConverter) {
@@ -45,19 +54,21 @@ object WordLibrary {
         save(context, JsonConverter)
     }
 
-    fun getCategories(): List<String> {
-        return words.map { it.category.value }.distinct()
+    fun getCategories(): List<Category> {
+        return words.map { it.categories.toMutableList() }
+            .flatten()
+            .distinct()
     }
 
     fun getWordsByCategory(category: Category): List<Word> {
-        return words.filter { it.category == category }
+        return words.filter { it.categories.contains(category) }
     }
 
     fun deleteWord(wordToDelete: Word, context: Context) {
-        val category = wordToDelete.category
+        val category = wordToDelete.categories.first()
         val before = getWordsByCategory(category).size
 
-        words.removeAll { it.value == wordToDelete.value && it.category == wordToDelete.category }
+        words.removeAll { it.value == wordToDelete.value && it.categories == wordToDelete.categories }
 
         save(context, JsonConverter)
 
@@ -69,8 +80,7 @@ object WordLibrary {
     }
 
     fun deleteAllInCategory(category: Category, context: Context) {
-        val hadWords = words.any { it.category == category }
-        words.removeAll { it.category == category }
+        val hadWords = words.removeAll { it.categories.contains(category) }
         save(context, JsonConverter)
 
         if (hadWords) {
@@ -79,7 +89,7 @@ object WordLibrary {
     }
 
     fun getRandomWord(category: String): Word? {
-        return words.filter { it.category.value == category }.randomOrNull()
+        return words.filter { it.categories.contains(Category(category)) }.randomOrNull()
     }
 
     fun getAllWords(): List<Word> = words.toList()

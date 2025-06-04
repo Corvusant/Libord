@@ -6,5 +6,6 @@ data class Category (
 
 data class Word(
     val value: String,
-    val category: Category
+    val categories: List<Category>
 )
+

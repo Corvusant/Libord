@@ -7,6 +7,7 @@
     <string name="save">Save</string>
     <string name="category">Category</string>
     <string name="word">Word</string>
-    <string name="export">Export</string>
-    <string name="delete_all_in_category">Delete All in Category</string>
+    <string name="Lib_export">Export</string>
+    <string name="delete_all_in_category">Clear Category</string>
+    <string name="Lib_import">Import</string>
 </resources>

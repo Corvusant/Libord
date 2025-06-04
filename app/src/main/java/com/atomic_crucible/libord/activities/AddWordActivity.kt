@@ -27,8 +27,13 @@ class AddWordActivity : AppCompatActivity() {
             val word = wordEditText.text.toString()
             val category = categoryEditText.text.toString()
 
+            val categories = category.splitToSequence(",")
+                .toList()
+                .map { it.trim() }
+                .map { Category(it) }
+
             if (word.isNotBlank() && category.isNotBlank()) {
-                WordLibrary.addWord(Word(word, Category(category)), this)
+                WordLibrary.addWord(Word(word,categories), this)
                 Toast.makeText(this, "Word Added", Toast.LENGTH_SHORT).show()
                 finish()
             } else {

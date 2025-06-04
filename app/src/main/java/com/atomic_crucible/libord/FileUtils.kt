@@ -2,20 +2,23 @@ package com.atomic_crucible.libord
 
 import android.content.Intent
 import android.app.Activity
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat.startActivityForResult
 
-const val CREATE_FILE = 1
+const val WRITE_LIB_FILE = 1
+const val READ_LIB_FILE = 2
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun createFile(sourceActivity: Activity) {
     val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
         addCategory(Intent.CATEGORY_OPENABLE)
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TITLE, "Libord_Library.txt")
-
-        //putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
+        type = "application/json"
+        putExtra(Intent.EXTRA_TITLE, "Libord_Library.json")
     }
-    sourceActivity.startActivityForResult(intent, CREATE_FILE)
+    sourceActivity.startActivityForResult(intent, WRITE_LIB_FILE)
+}
+
+fun openFile(sourceActivity: Activity) {
+    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        addCategory(Intent.CATEGORY_OPENABLE)
+        type = "application/json"
+    }
+    sourceActivity.startActivityForResult(intent,READ_LIB_FILE)
 }
