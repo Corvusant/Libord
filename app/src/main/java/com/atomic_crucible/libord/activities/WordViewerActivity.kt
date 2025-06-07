@@ -92,6 +92,7 @@ class WordViewerActivity : AppCompatActivity() {
                             val type = object : TypeToken<MutableList<Word>>() {}.type
                             val words = JsonConverter.fromJson<List<Word>>(json, type)
                             WordLibrary.loadNewWords(words.toList())
+                            WordLibrary.save(this, JsonConverter)
                             updateWordList(CATEGORY_ALL)
                         }
                     }
@@ -138,6 +139,10 @@ class WordViewerActivity : AppCompatActivity() {
                 else -> adapterSpinner.remove(removedCategory.value)
             }
         }
+
+        WordLibrary.onCategoryAdded = {
+            addedCategory -> adapterSpinner.add(addedCategory.value)
+        }
     }
 
     private fun setupRecyclerView() {
@@ -148,10 +153,9 @@ class WordViewerActivity : AppCompatActivity() {
     }
 
     private fun updateWordList(category: Category) {
-        val words = if (category == CATEGORY_ALL) {
-            WordLibrary.getAllWords()
-        } else {
-            WordLibrary.getWordsByCategory(category)
+        val words = when(category) {
+            CATEGORY_ALL -> WordLibrary.getAllWords()
+            else -> WordLibrary.getWordsByCategory(category)
         }
         adapter.updateWords(words)
     }

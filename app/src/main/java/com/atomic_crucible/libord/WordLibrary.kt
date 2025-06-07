@@ -4,15 +4,24 @@ import android.content.Context
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import com.atomic_crucible.libord.optional.*
+import com.atomic_crucible.libord.optional.flatten
+import com.atomic_crucible.libord.optional.map
 
 val CATEGORY_ALL = Category("All")
 
+fun getCategoriesFromWords(words:List<Word>) =
+    words.map { it.categories.toMutableList() }
+        .flatten()
+        .distinct()
+
+
 object WordLibrary {
-    private const val FILE_NAME = "words.json"
+    private const val FILE_NAME = "Library.json"
     private var words = mutableListOf<Word>()
     private var lastSelectedCategory : Optional<Category> = None
 
     var onCategoryCleared: ((Category) -> Unit)? = null
+    var onCategoryAdded: ((Category) -> Unit)? = null
 
     fun load(context: Context, converter : JsonConverter) {
         val file = File(context.filesDir, FILE_NAME)
@@ -31,8 +40,16 @@ object WordLibrary {
 
     fun loadNewWords(inWords: List<Word> ) : Unit
     {
+        val categories = getCategories()
+        val newCategories = getCategoriesFromWords(inWords)
+        val addedCategories = categories.union(newCategories).subtract(categories)
+
         words = words.union(inWords)
             .toMutableList()
+
+        for (category in addedCategories) {
+            onCategoryAdded?.invoke(category)
+        }
     }
 
     fun save(context: Context, conveter: JsonConverter) {
@@ -54,11 +71,8 @@ object WordLibrary {
         save(context, JsonConverter)
     }
 
-    fun getCategories(): List<Category> {
-        return words.map { it.categories.toMutableList() }
-            .flatten()
-            .distinct()
-    }
+    fun getCategories(): List<Category> =
+         getCategoriesFromWords(words)
 
     fun getWordsByCategory(category: Category): List<Word> {
         return words.filter { it.categories.contains(category) }
