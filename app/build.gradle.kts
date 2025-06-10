@@ -33,6 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {

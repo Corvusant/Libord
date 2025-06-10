@@ -10,4 +10,6 @@
     <string name="Lib_export">Export</string>
     <string name="delete_all_in_category">Clear Category</string>
     <string name="Lib_import">Import</string>
+    <string name="next">Next</string>
+    <string name="selected_word">Selected Word</string>
 </resources>

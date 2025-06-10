@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Libord</string>
+    <string name="Libord">Libord</string>
+    <string name="add_word">Wort hinzufügen</string>
+    <string name="pick_random_word">Zufalls Wort</string>
+    <string name="add_new_word">Neues Wort hinzufügen</string>
+    <string name="save">Speichern</string>
+    <string name="category">Kategorie</string>
+    <string name="word">Wort</string>
+    <string name="Lib_export">Exportieren</string>
+    <string name="delete_all_in_category">Kategorie Leeren</string>
+    <string name="Lib_import">Importieren</string>
+    <string name="next">Näcshtes Wort</string>
+    <string name="selected_word">Wort auswählen</string>
+</resources>
