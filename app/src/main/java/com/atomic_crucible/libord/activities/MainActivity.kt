@@ -62,6 +62,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPostResume() {
+        super.onPostResume()
+        setCategorySelection()
+    }
+
     private fun setCategorySelection() {
         WordLibrary.getLastSelectedCategory()
             .executeIfSet { c ->

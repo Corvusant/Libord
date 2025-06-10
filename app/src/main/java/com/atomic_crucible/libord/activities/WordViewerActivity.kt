@@ -25,7 +25,7 @@ import java.io.FileOutputStream
 
 class WordViewerActivity : AppCompatActivity() {
 
-    private lateinit var spinnerCategory: Spinner
+    private lateinit var categorySpinner: Spinner
     private lateinit var recyclerView: RecyclerView
     private lateinit var deleteAllButton: Button
     private lateinit var exportButton : Button
@@ -38,7 +38,7 @@ class WordViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_viewer)
 
-        spinnerCategory = findViewById(R.id.spinnerFilterCategory)
+        categorySpinner = findViewById(R.id.spinnerFilterCategory)
         recyclerView = findViewById(R.id.recyclerViewWords)
         deleteAllButton = findViewById(R.id.buttonDeleteAll)
         exportButton = findViewById(R.id.exportButton)
@@ -114,9 +114,9 @@ class WordViewerActivity : AppCompatActivity() {
             mutableListOf(CATEGORY_ALL.value) + WordLibrary.getCategories().map { it.value }
         val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerCategory.adapter = adapterSpinner
+        categorySpinner.adapter = adapterSpinner
 
-        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -158,5 +158,23 @@ class WordViewerActivity : AppCompatActivity() {
             else -> WordLibrary.getWordsByCategory(category)
         }
         adapter.updateWords(words)
+    }
+
+
+    override fun onPostResume() {
+        super.onPostResume()
+        setCategorySelection()
+    }
+
+    private fun setCategorySelection() {
+        WordLibrary.getLastSelectedCategory()
+            .executeIfSet { c ->
+                for (i in 0 until categorySpinner.adapter.count) {
+                    if (categorySpinner.adapter.getItem(i) == c.value) {
+                        categorySpinner.setSelection(i)
+                        break
+                    }
+                }
+            }
     }
 }
