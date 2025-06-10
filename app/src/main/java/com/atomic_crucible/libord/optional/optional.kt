@@ -20,9 +20,9 @@ fun <A, B> Optional<A>.bind(f: (A) -> Optional<B>): Optional<B>
 
 fun <A> Optional<A>.executeIfSet(f: (A) -> Unit ) : Unit
         = when (this) {
-        is Some<A> -> f(this.get)
-        is None -> Unit
-}
+            is Some<A> -> f(this.get)
+            is None -> Unit
+        }
 
 fun <A, B> Optional<A>.flatten(fSet: (A) -> B, fUnset: () -> B): B
     = when (this) {

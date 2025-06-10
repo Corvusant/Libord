@@ -2,7 +2,7 @@
     <string name="app_name">Libord</string>
     <string name="Libord">Libord</string>
     <string name="add_word">Add Word</string>
-    <string name="pick_random_word">Pick Random Word</string>
+    <string name="pick_random_word">Show Random Word</string>
     <string name="add_new_word">Add New Word</string>
     <string name="save">Save</string>
     <string name="category">Category</string>
@@ -11,5 +11,5 @@
     <string name="delete_all_in_category">Clear Category</string>
     <string name="Lib_import">Import</string>
     <string name="next">Next</string>
-    <string name="selected_word">Selected Word</string>
+    <string name="no_word_in_library">No Word in library</string>
 </resources>

@@ -4,8 +4,6 @@ import android.content.Context
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import com.atomic_crucible.libord.optional.*
-import com.atomic_crucible.libord.optional.flatten
-import com.atomic_crucible.libord.optional.map
 
 val CATEGORY_ALL = Category("All")
 
@@ -27,8 +25,10 @@ object WordLibrary {
         val file = File(context.filesDir, FILE_NAME)
         if (file.exists()) {
             val json = file.readText()
-            val type = object : TypeToken<MutableList<Word>>() {}.type
-            val loadedWords : MutableList<Word> = converter.fromJson(json, type) ?: mutableListOf()
+            val loadedWords : MutableList<Word> = converter.fromJson(
+                json,
+                object : TypeToken<MutableList<Word>>() {}.type
+                ) ?: mutableListOf()
             loadNewWords(loadedWords.toList())
             lastSelectedCategory = fromNullable(
                 words.map { w -> w.categories.first() }
@@ -102,9 +102,14 @@ object WordLibrary {
         }
     }
 
-    fun getRandomWord(category: String): Word? {
-        return words.filter { it.categories.contains(Category(category)) }.randomOrNull()
-    }
+    fun getRandomWord(category: Category): Optional<Word> =
+        fromNullable(words.filter { it.categories.contains(category) }.randomOrNull())
 
-    fun getAllWords(): List<Word> = words.toList()
+    fun getAllWords(): List<Word> =
+        words.toList()
+
+    fun hasItems(category: Category): Boolean =
+        words.filter { it.categories.contains(category) }
+        .any()
+
 }

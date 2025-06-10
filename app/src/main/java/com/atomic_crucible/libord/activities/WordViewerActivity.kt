@@ -88,10 +88,12 @@ class WordViewerActivity : AppCompatActivity() {
                     uri->
                     contentResolver.openFileDescriptor(uri,"r")?.use {
                         FileInputStream(it.fileDescriptor).use {
-                            val json = it.bufferedReader().readText();
-                            val type = object : TypeToken<MutableList<Word>>() {}.type
-                            val words = JsonConverter.fromJson<List<Word>>(json, type)
-                            WordLibrary.loadNewWords(words.toList())
+                        fd ->
+                            val json = fd.bufferedReader().readText();
+                            val words = JsonConverter.fromJson<List<Word>>(
+                                json,
+                                object : TypeToken<List<Word>>() {}.type) ?: listOf<Word>()
+                            WordLibrary.loadNewWords(words)
                             WordLibrary.save(this, JsonConverter)
                             updateWordList(CATEGORY_ALL)
                         }

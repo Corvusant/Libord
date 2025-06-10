@@ -14,38 +14,36 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var categorySpinner: Spinner
-    private lateinit var wordTextView: TextView
-    private lateinit var newWordButton: FloatingActionButton
-    private lateinit var libViewButton: FloatingActionButton
-    private lateinit var pickWordButton: Button
+    private lateinit var spinnerCategory: Spinner
+    private lateinit var btnNewWord: FloatingActionButton
+    private lateinit var btnLibView: FloatingActionButton
+    private lateinit var btnPickWord: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WordLibrary.load(this, JsonConverter)
         setContentView(R.layout.activity_main)
 
-        categorySpinner = findViewById(R.id.spinnerCategory)
-        wordTextView = findViewById(R.id.textViewWord)
-        newWordButton = findViewById(R.id.buttonNewWord)
-        pickWordButton = findViewById(R.id.buttonPickWord)
-        libViewButton = findViewById(R.id.buttonLibrary)
+        spinnerCategory = findViewById(R.id.spinnerCategory)
+        btnNewWord = findViewById(R.id.buttonNewWord)
+        btnPickWord = findViewById(R.id.buttonPickWord)
+        btnLibView = findViewById(R.id.buttonLibrary)
 
         populateCategories()
         setCategorySelection()
 
-        newWordButton.setOnClickListener {
+        btnNewWord.setOnClickListener {
             startActivity(Intent(this, AddWordActivity::class.java))
         }
 
-        pickWordButton.setOnClickListener {
-            val category = categorySpinner.selectedItem.toString()
-            fromNullable(WordLibrary.getRandomWord(category))
-                .bind { w -> fromNullable(w.value) }
+        btnPickWord.setOnClickListener {
+            val category = Category(spinnerCategory.selectedItem.toString())
+            WordLibrary.getRandomWord(category)
                 .flatten(
-                { v ->
+                { // for some reason we get option of Word here instead of word
+                    val word = JsonConverter.toJson(it)
                     val intent = Intent(this, ShowWordActivity::class.java)
-                    intent.putExtra("SELECTED_WORD", v)
+                    intent.putExtra("SELECTED_WORD", word )
                     startActivity(intent)
                 },
                 {
@@ -53,8 +51,8 @@ class MainActivity : AppCompatActivity() {
                 })
         }
 
-        libViewButton.setOnClickListener {
-            val category = categorySpinner.selectedItem.toString()
+        btnLibView.setOnClickListener {
+            val category = spinnerCategory.selectedItem.toString()
             val intent = Intent(this,
                 WordViewerActivity::class.java)
             intent.putExtra("CATEGORY", category)
@@ -70,9 +68,9 @@ class MainActivity : AppCompatActivity() {
     private fun setCategorySelection() {
         WordLibrary.getLastSelectedCategory()
             .executeIfSet { c ->
-                for (i in 0 until categorySpinner.adapter.count) {
-                    if (categorySpinner.adapter.getItem(i) == c.value) {
-                        categorySpinner.setSelection(i)
+                for (i in 0 until spinnerCategory.adapter.count) {
+                    if (spinnerCategory.adapter.getItem(i) == c.value) {
+                        spinnerCategory.setSelection(i)
                         break
                     }
                 }
@@ -83,12 +81,14 @@ class MainActivity : AppCompatActivity() {
         val categories = WordLibrary.getCategories().map { it.value }.ifEmpty { listOf("None") }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = adapter
+        spinnerCategory.adapter = adapter
 
-        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val currentCategory = Category(categories[position])
                 WordLibrary.setLastSelectedCategory(Some(currentCategory))
+                btnPickWord.isEnabled =WordLibrary.hasItems(currentCategory)
+
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
