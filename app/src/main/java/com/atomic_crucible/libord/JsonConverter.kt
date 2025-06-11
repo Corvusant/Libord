@@ -48,11 +48,14 @@ class EntryDeserializer : JsonDeserializer<Entry>{
                 }
             }
 
-            val entryTypeStr = it.get("entryType")?.asString
             val entryType = try {
-                EntryType.valueOf(entryTypeStr ?: "")
+                when(val entryTypeStr = it.get("entryType")?.asString)
+                {
+                    null ->  EntryType.Noun
+                    else -> EntryType.valueOf(entryTypeStr)
+                }
             } catch (e: Exception) {
-                EntryType.Noun// Use a default if enum is missing or invalid
+                EntryType.None// Use a default if enum is missing or invalid
             }
 
             val article: Optional<Article> = if (it.has("article") && !it.get("article").isJsonNull) {

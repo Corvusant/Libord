@@ -20,7 +20,7 @@ val ErrorEntry : Entry = Entry("##ERROR##", listOf(), EntryType.None, None)
 data class Entry (
     val value: String,
     val categories: List<Category>,
-    val enum: Enum<EntryType>,
+    val entryType: EntryType,
     val article: Optional<Article>
 )
 {
@@ -28,12 +28,12 @@ data class Entry (
         return article.flatten({
             value.hashCode()
                 .and(categories.hashCode())
-                .and(enum.hashCode())
+                .and(entryType.hashCode())
                 .and(it.hashCode())
         },{
             value.hashCode()
                 .and(categories.hashCode())
-                .and(enum.hashCode())
+                .and(entryType.hashCode())
         })
     }
 }
