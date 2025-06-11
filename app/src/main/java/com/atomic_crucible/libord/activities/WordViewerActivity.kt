@@ -14,7 +14,9 @@ import com.atomic_crucible.libord.JsonConverter
 
 import com.atomic_crucible.libord.WordLibrary
 import com.atomic_crucible.libord.R
-import com.atomic_crucible.libord.Word
+import com.atomic_crucible.libord.Entry
+import com.atomic_crucible.libord.READ_LIB_FILE
+import com.atomic_crucible.libord.WRITE_LIB_FILE
 import com.atomic_crucible.libord.activities.Components.WordsAdapter
 import com.atomic_crucible.libord.createFile
 import com.atomic_crucible.libord.openFile
@@ -73,7 +75,7 @@ class WordViewerActivity : AppCompatActivity() {
 
             when(requestCode)
             {
-                 1 -> data?.data?.also {
+                 WRITE_LIB_FILE -> data?.data?.also {
                      uri ->
                         val words = WordLibrary.getAllWords();
                         val json = JsonConverter.toJson(words)
@@ -84,16 +86,16 @@ class WordViewerActivity : AppCompatActivity() {
                             }
                     }
                 }
-                2 -> data?.data?.also {
+                READ_LIB_FILE -> data?.data?.also {
                     uri->
                     contentResolver.openFileDescriptor(uri,"r")?.use {
                         FileInputStream(it.fileDescriptor).use {
                         fd ->
                             val json = fd.bufferedReader().readText();
-                            val words = JsonConverter.fromJson<List<Word>>(
+                            val entries = JsonConverter.fromJson<List<Entry>>(
                                 json,
-                                object : TypeToken<List<Word>>() {}.type) ?: listOf<Word>()
-                            WordLibrary.loadNewWords(words)
+                                object : TypeToken<List<Entry>>() {}.type) ?: listOf<Entry>()
+                            WordLibrary.loadNewWords(entries)
                             WordLibrary.save(this, JsonConverter)
                             updateWordList(CATEGORY_ALL)
                         }
@@ -165,6 +167,7 @@ class WordViewerActivity : AppCompatActivity() {
 
     override fun onPostResume() {
         super.onPostResume()
+        updateWordList(CATEGORY_ALL)
         setCategorySelection()
     }
 

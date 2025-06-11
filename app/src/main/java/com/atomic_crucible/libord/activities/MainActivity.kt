@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
                 { // for some reason we get option of Word here instead of word
                     val word = JsonConverter.toJson(it)
                     val intent = Intent(this, ShowWordActivity::class.java)
-                    intent.putExtra("SELECTED_WORD", word )
+                    intent.putExtra("ENTRY", word )
                     startActivity(intent)
                 },
                 {

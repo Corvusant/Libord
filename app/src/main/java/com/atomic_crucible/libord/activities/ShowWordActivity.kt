@@ -8,7 +8,7 @@ import com.atomic_crucible.libord.CATEGORY_ALL
 import com.atomic_crucible.libord.JsonConverter
 import com.atomic_crucible.libord.R
 import com.atomic_crucible.libord.WordLibrary
-import com.atomic_crucible.libord.Word
+import com.atomic_crucible.libord.Entry
 import com.atomic_crucible.libord.optional.*
 import com.google.gson.reflect.TypeToken
 
@@ -23,13 +23,13 @@ class ShowWordActivity : AppCompatActivity() {
 
         wordTextView = findViewById(R.id.textViewSelectedWord)
         btnNextWord = findViewById(R.id.buttonReturn)
-        val word = fromNullable(intent.getStringExtra("SELECTED_WORD"))
+        val entry = fromNullable(intent.getStringExtra("ENTRY"))
             .map {
-                JsonConverter.fromJson<Word>(
+                JsonConverter.fromJson<Entry>(
                     it,
-                    object : TypeToken<Word>() {}.type)
+                    object : TypeToken<Entry>() {}.type)
             }
-        showWord(word);
+        showWord(entry);
 
         btnNextWord.setOnClickListener {
             val currentCategory = WordLibrary.getLastSelectedCategory()
@@ -38,8 +38,8 @@ class ShowWordActivity : AppCompatActivity() {
         }
     }
 
-    private fun showWord(word : Optional<Word>)
+    private fun showWord(entry : Optional<Entry>)
     {
-        wordTextView.text = word.flatten({it.value},{ getString(R.string.no_word_in_library)})
+        wordTextView.text = entry.flatten({it.value},{ getString(R.string.no_word_in_library)})
     }
 }

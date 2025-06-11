@@ -5,24 +5,47 @@
     android:layout_height="wrap_content"
     android:layout_weight="1">
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/buttonDeleteWord"
+    <LinearLayout
+        android:id="@+id/buttoncontainerd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_weight="1"
-        android:clickable="true"
-        android:src="@android:drawable/ic_delete"
-        app:fabSize="auto"
+        android:minHeight="33dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.954"
-        app:layout_constraintStart_toEndOf="@+id/linearLayout"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@android:drawable/ic_delete" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonEditWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:src="@android:drawable/ic_menu_edit"
+            app:fabCustomSize="38dp"
+            app:fabSize="auto"
+            tools:srcCompat="@android:drawable/ic_menu_edit" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonDeleteWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:src="@android:drawable/ic_menu_delete"
+            app:fabCustomSize="38dp"
+            app:fabSize="auto"
+            tools:srcCompat="@android:drawable/ic_delete" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout"

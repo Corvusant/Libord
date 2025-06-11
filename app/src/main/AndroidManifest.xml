@@ -21,6 +21,9 @@
             android:name=".activities.AddWordActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.EditWordActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>

@@ -12,4 +12,5 @@
     <string name="Lib_import">Import</string>
     <string name="next">Next</string>
     <string name="no_word_in_library">No Word in library</string>
+    <string name="edit_word">Edit Word</string>
 </resources>

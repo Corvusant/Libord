@@ -1,5 +1,6 @@
 package com.atomic_crucible.libord
 
+import android.app.Activity
 import android.content.Context
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -7,15 +8,15 @@ import com.atomic_crucible.libord.optional.*
 
 val CATEGORY_ALL = Category("All")
 
-fun getCategoriesFromWords(words:List<Word>) =
-    words.map { it.categories.toMutableList() }
+fun getCategoriesFromWords(entries:List<Entry>) =
+    entries.map { it.categories.toMutableList() }
         .flatten()
         .distinct()
 
 
 object WordLibrary {
     private const val FILE_NAME = "Library.json"
-    private var words = mutableListOf<Word>()
+    private var entries = mutableListOf<Entry>()
     private var lastSelectedCategory : Optional<Category> = None
 
     var onCategoryCleared: ((Category) -> Unit)? = null
@@ -25,26 +26,26 @@ object WordLibrary {
         val file = File(context.filesDir, FILE_NAME)
         if (file.exists()) {
             val json = file.readText()
-            val loadedWords : MutableList<Word> = converter.fromJson(
+            val loadedEntries : MutableList<Entry> = converter.fromJson(
                 json,
-                object : TypeToken<MutableList<Word>>() {}.type
+                object : TypeToken<MutableList<Entry>>() {}.type
                 ) ?: mutableListOf()
-            loadNewWords(loadedWords.toList())
+            loadNewWords(loadedEntries.toList())
             lastSelectedCategory = fromNullable(
-                words.map { w -> w.categories.first() }
+                entries.map { w -> w.categories.first() }
                 .sortedBy{ c -> c.value }
                 .distinct()
                 .firstOrNull())
         }
     }
 
-    fun loadNewWords(inWords: List<Word> ) : Unit
+    fun loadNewWords(inEntries: List<Entry> ) : Unit
     {
         val categories = getCategories()
-        val newCategories = getCategoriesFromWords(inWords)
-        val addedCategories = categories.union(newCategories).subtract(categories)
+        val newCategories = getCategoriesFromWords(inEntries)
+        val addedCategories = categories.union(newCategories).subtract(categories.toSet())
 
-        words = words.union(inWords)
+        entries = entries.union(inEntries)
             .toMutableList()
 
         for (category in addedCategories) {
@@ -53,7 +54,7 @@ object WordLibrary {
     }
 
     fun save(context: Context, conveter: JsonConverter) {
-        val json = conveter.toJson(words)
+        val json = conveter.toJson(entries)
         File(context.filesDir, FILE_NAME).writeText(json)
     }
 
@@ -65,24 +66,24 @@ object WordLibrary {
     fun getLastSelectedCategory() : Optional<Category>
         = lastSelectedCategory
 
-    fun addWord(word: Word, context: Context) {
-        words.add(word)
+    fun addEntry(entry: Entry, context: Context) {
+        entries.add(entry)
 
         save(context, JsonConverter)
     }
 
     fun getCategories(): List<Category> =
-         getCategoriesFromWords(words)
+         getCategoriesFromWords(entries)
 
-    fun getWordsByCategory(category: Category): List<Word> {
-        return words.filter { it.categories.contains(category) }
+    fun getWordsByCategory(category: Category): List<Entry> {
+        return entries.filter { it.categories.contains(category) }
     }
 
-    fun deleteWord(wordToDelete: Word, context: Context) {
-        val category = wordToDelete.categories.first()
+    fun deleteWord(entryToDelete: Entry, context: Context) {
+        val category = entryToDelete.categories.first()
         val before = getWordsByCategory(category).size
 
-        words.removeAll { it.value == wordToDelete.value && it.categories == wordToDelete.categories }
+        entries.removeAll { it.value == entryToDelete.value && it.categories == entryToDelete.categories }
 
         save(context, JsonConverter)
 
@@ -94,7 +95,7 @@ object WordLibrary {
     }
 
     fun deleteAllInCategory(category: Category, context: Context) {
-        val hadWords = words.removeAll { it.categories.contains(category) }
+        val hadWords = entries.removeAll { it.categories.contains(category) }
         save(context, JsonConverter)
 
         if (hadWords) {
@@ -102,14 +103,23 @@ object WordLibrary {
         }
     }
 
-    fun getRandomWord(category: Category): Optional<Word> =
-        fromNullable(words.filter { it.categories.contains(category) }.randomOrNull())
+    fun getRandomWord(category: Category): Optional<Entry> =
+        fromNullable(entries.filter { it.categories.contains(category) }.randomOrNull())
 
-    fun getAllWords(): List<Word> =
-        words.toList()
+    fun getAllWords(): List<Entry> =
+        entries.toList()
 
     fun hasItems(category: Category): Boolean =
-        words.filter { it.categories.contains(category) }
+        entries.filter { it.categories.contains(category) }
         .any()
+
+    fun any(): Entry = if(entries.any()) { entries.first() } else { ErrorEntry}
+    fun updateEntry(editedEntry: Entry, newValue: Entry,context: Context) {
+        when(val index = entries.indexOf(editedEntry)) {
+            -1 -> return
+            else -> entries[index] = newValue
+        }
+
+    }
 
 }
