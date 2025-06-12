@@ -28,16 +28,43 @@
             android:layout_marginTop="5dp"
             android:hint="@string/category" />
 
-        <Button
-            android:id="@+id/buttonSave"
+        <Spinner
+            android:id="@+id/spinnerEntryType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:text="@string/save" />
+            android:layout_marginTop="5dp"/>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:visibility="visible"
+            app:srcCompat="@android:drawable/divider_horizontal_dark"
+            tools:srcCompat="@android:drawable/screen_background_dark_transparent" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="15dp" />
+
+        <Spinner
+            android:id="@+id/spinnerArticle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView2"

@@ -5,20 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textViewSelectedWord"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingBottom="32dp"
-        android:text="Super long test value I use to determine how very long words/ phrases look"
-        android:textSize="38sp"
-        android:textStyle="bold"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textViewArticle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="15dp"
+            android:text="Der"
+            android:textSize="38sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textViewSelectedWord"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="32dp"
+            android:text="Super long test value I use to determine how very long words/ phrases look"
+            android:textSize="38sp"
+            android:textStyle="bold"
+
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/buttonReturn"

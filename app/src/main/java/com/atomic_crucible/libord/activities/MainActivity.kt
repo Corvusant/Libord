@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.atomic_crucible.libord.Category
-import com.atomic_crucible.libord.JsonConverter
+import com.atomic_crucible.libord.types.Category
+import com.atomic_crucible.libord.serialization.JsonConverter
 import com.atomic_crucible.libord.R
-import com.atomic_crucible.libord.WordLibrary
+import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.optional.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val currentCategory = Category(categories[position])
                 WordLibrary.setLastSelectedCategory(Some(currentCategory))
-                btnPickWord.isEnabled =WordLibrary.hasItems(currentCategory)
+                btnPickWord.isEnabled = WordLibrary.hasItems(currentCategory)
 
             }
 

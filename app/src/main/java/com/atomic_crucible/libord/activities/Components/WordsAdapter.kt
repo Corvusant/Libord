@@ -9,9 +9,9 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.atomic_crucible.libord.R
-import com.atomic_crucible.libord.Entry
-import com.atomic_crucible.libord.JsonConverter
-import com.atomic_crucible.libord.WordLibrary
+import com.atomic_crucible.libord.types.Entry
+import com.atomic_crucible.libord.serialization.JsonConverter
+import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.activities.EditWordActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 

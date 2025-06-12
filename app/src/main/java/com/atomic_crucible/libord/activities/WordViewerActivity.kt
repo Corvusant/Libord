@@ -8,13 +8,13 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.atomic_crucible.libord.CATEGORY_ALL
-import com.atomic_crucible.libord.Category
-import com.atomic_crucible.libord.JsonConverter
+import com.atomic_crucible.libord.types.CATEGORY_ALL
+import com.atomic_crucible.libord.types.Category
+import com.atomic_crucible.libord.serialization.JsonConverter
 
-import com.atomic_crucible.libord.WordLibrary
+import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.R
-import com.atomic_crucible.libord.Entry
+import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.READ_LIB_FILE
 import com.atomic_crucible.libord.WRITE_LIB_FILE
 import com.atomic_crucible.libord.activities.Components.WordsAdapter

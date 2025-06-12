@@ -1,34 +1,33 @@
 package com.atomic_crucible.libord.activities
 
 import android.os.Bundle
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.atomic_crucible.libord.CATEGORY_ALL
-import com.atomic_crucible.libord.JsonConverter
+import com.atomic_crucible.libord.types.CATEGORY_ALL
+import com.atomic_crucible.libord.serialization.JsonConverter
 import com.atomic_crucible.libord.R
-import com.atomic_crucible.libord.WordLibrary
-import com.atomic_crucible.libord.Entry
+import com.atomic_crucible.libord.types.WordLibrary
+import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.optional.*
-import com.google.gson.reflect.TypeToken
 
 class ShowWordActivity : AppCompatActivity() {
 
-    private lateinit var wordTextView: TextView
+    private lateinit var textViewArticle: TextView
+    private lateinit var textViewEntry: TextView
     private lateinit var btnNextWord : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_show_word)
 
-        wordTextView = findViewById(R.id.textViewSelectedWord)
+        textViewEntry = findViewById(R.id.textViewSelectedWord)
+        textViewArticle = findViewById(R.id.textViewArticle)
         btnNextWord = findViewById(R.id.buttonReturn)
         val entry = fromNullable(intent.getStringExtra("ENTRY"))
-            .map {
-                JsonConverter.fromJson<Entry>(
-                    it,
-                    object : TypeToken<Entry>() {}.type)
-            }
+            .map { JsonConverter.fromJson<Entry>(it, Entry::class.java)}
         showWord(entry);
 
         btnNextWord.setOnClickListener {
@@ -40,6 +39,15 @@ class ShowWordActivity : AppCompatActivity() {
 
     private fun showWord(entry : Optional<Entry>)
     {
-        wordTextView.text = entry.flatten({it.value},{ getString(R.string.no_word_in_library)})
+        entry.executeIfSet {
+            textViewEntry.text = it.value
+            it.article.flatten(
+            { a ->
+                textViewArticle.visibility = VISIBLE
+                textViewArticle.text = a.toString()
+            },
+            { textViewArticle.visibility = GONE }
+            )
+        }
     }
 }

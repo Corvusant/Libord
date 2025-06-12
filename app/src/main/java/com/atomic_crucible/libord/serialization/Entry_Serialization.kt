@@ -1,34 +1,26 @@
-package com.atomic_crucible.libord
+package com.atomic_crucible.libord.serialization
 
 import com.atomic_crucible.libord.optional.None
 import com.atomic_crucible.libord.optional.Optional
-import com.atomic_crucible.libord.optional.Some
 import com.atomic_crucible.libord.optional.fromNullable
 import com.atomic_crucible.libord.optional.getOrElse
 import com.atomic_crucible.libord.optional.map
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
+import com.atomic_crucible.libord.types.Article
+import com.atomic_crucible.libord.types.Category
+import com.atomic_crucible.libord.types.EntryType
+import com.atomic_crucible.libord.types.ErrorEntry
+import com.atomic_crucible.libord.types.Entry
+
 import java.lang.reflect.Type
 
-object JsonConverter {
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonArray
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.reflect.TypeToken
 
-    private var gson = GsonBuilder()
-        .registerTypeAdapter(Entry::class.java, EntryDeserializer())
-        .create()
 
-    fun <A> toJson (item:A) : String {
-        return gson.toJson(item)
-    }
-
-    fun <A> fromJson(json: String, typeToken: Type) : A {
-        return gson.fromJson<A>(json, typeToken)
-    }
-}
-
-class EntryDeserializer : JsonDeserializer<Entry>{
+class EntryDeserializer : JsonDeserializer<Entry> {
     override fun deserialize(
         json: JsonElement,
         typeOfT: Type,
@@ -60,14 +52,7 @@ class EntryDeserializer : JsonDeserializer<Entry>{
 
             val article: Optional<Article> = if (it.has("article") && !it.get("article").isJsonNull) {
                 try {
-                    val articleObj = context.deserialize<Article>(it.get("article"), Article::class.java)
-                    if (articleObj.value != null) { // intellij suggests this can never be null, this is a lie
-                        Some(articleObj)
-                    }
-                    else
-                    {
-                        None
-                    }
+                    context.deserialize<Optional<Article>>(it.get("article"),  object : TypeToken<Optional<Article>>() {}.type)
                 } catch (e: Exception) {
                     None
                 }
@@ -81,6 +66,6 @@ class EntryDeserializer : JsonDeserializer<Entry>{
                 entryType,
                 article)
         }
-        .getOrElse { ErrorEntry} // find a better fallback here but in case we deserialize garbage we need to know
+        .getOrElse { ErrorEntry } // find a better fallback here but in case we deserialize garbage we need to know
     }
 }

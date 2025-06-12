@@ -3,13 +3,13 @@ package com.atomic_crucible.libord.activities
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import com.atomic_crucible.libord.Category
+import com.atomic_crucible.libord.types.Category
 import com.atomic_crucible.libord.R
 
-import com.atomic_crucible.libord.Entry
-import com.atomic_crucible.libord.EntryType
-import com.atomic_crucible.libord.JsonConverter
-import com.atomic_crucible.libord.WordLibrary
+import com.atomic_crucible.libord.types.Entry
+import com.atomic_crucible.libord.types.EntryType
+import com.atomic_crucible.libord.serialization.JsonConverter
+import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.optional.None
 import com.atomic_crucible.libord.optional.fromNullable
 import com.atomic_crucible.libord.optional.getOrElse
@@ -60,7 +60,8 @@ class EditWordActivity : AppCompatActivity() {
                 .map { Category(it) }
 
             if (word.isNotBlank() && category.isNotBlank()) {
-                WordLibrary.updateEntry(EditedEntry ,Entry(word,categories, EntryType.Noun, None), this)
+                WordLibrary.updateEntry(EditedEntry ,
+                    Entry(word,categories, EntryType.Noun, None), this)
                 Toast.makeText(this, "Word edited", Toast.LENGTH_SHORT).show()
                 finish()
             } else {

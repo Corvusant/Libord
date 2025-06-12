@@ -1,7 +1,7 @@
-package com.atomic_crucible.libord
+package com.atomic_crucible.libord.types
 
-import android.app.Activity
 import android.content.Context
+import com.atomic_crucible.libord.serialization.JsonConverter
 import com.google.gson.reflect.TypeToken
 import java.io.File
 import com.atomic_crucible.libord.optional.*
@@ -26,10 +26,10 @@ object WordLibrary {
         val file = File(context.filesDir, FILE_NAME)
         if (file.exists()) {
             val json = file.readText()
-            val loadedEntries : MutableList<Entry> = converter.fromJson(
+            val loadedEntries : MutableList<Entry> = JsonConverter.fromJson(
                 json,
                 object : TypeToken<MutableList<Entry>>() {}.type
-                ) ?: mutableListOf()
+            ) ?: mutableListOf()
             loadNewWords(loadedEntries.toList())
             lastSelectedCategory = fromNullable(
                 entries.map { w -> w.categories.first() }
@@ -54,7 +54,7 @@ object WordLibrary {
     }
 
     fun save(context: Context, conveter: JsonConverter) {
-        val json = conveter.toJson(entries)
+        val json = JsonConverter.toJson(entries)
         File(context.filesDir, FILE_NAME).writeText(json)
     }
 
@@ -113,8 +113,9 @@ object WordLibrary {
         entries.filter { it.categories.contains(category) }
         .any()
 
-    fun any(): Entry = if(entries.any()) { entries.first() } else { ErrorEntry}
-    fun updateEntry(editedEntry: Entry, newValue: Entry,context: Context) {
+    fun any(): Entry = if(entries.any()) { entries.first() } else { ErrorEntry
+    }
+    fun updateEntry(editedEntry: Entry, newValue: Entry, context: Context) {
         when(val index = entries.indexOf(editedEntry)) {
             -1 -> return
             else -> entries[index] = newValue

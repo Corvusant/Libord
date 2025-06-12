@@ -1,4 +1,4 @@
-package com.atomic_crucible.libord
+package com.atomic_crucible.libord.types
 
 import com.atomic_crucible.libord.optional.None
 import com.atomic_crucible.libord.optional.Optional
@@ -12,9 +12,9 @@ enum class EntryType {
     Noun, Verb, Phrase, None
 }
 
-data class Article (
-    val value: String
-)
+enum class Article {
+    der, die, das
+}
 
 val ErrorEntry : Entry = Entry("##ERROR##", listOf(), EntryType.None, None)
 data class Entry (
