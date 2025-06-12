@@ -167,19 +167,24 @@ class WordViewerActivity : AppCompatActivity() {
 
     override fun onPostResume() {
         super.onPostResume()
-        updateWordList(CATEGORY_ALL)
-        setCategorySelection()
+
+        WordLibrary.getLastSelectedCategory()
+            .flatten({
+                setCategorySelection(it)
+                updateWordList(it)
+            },
+            {
+                setCategorySelection(CATEGORY_ALL)
+                updateWordList(CATEGORY_ALL)
+            })
     }
 
-    private fun setCategorySelection() {
-        WordLibrary.getLastSelectedCategory()
-            .executeIfSet { c ->
-                for (i in 0 until categorySpinner.adapter.count) {
-                    if (categorySpinner.adapter.getItem(i) == c.value) {
-                        categorySpinner.setSelection(i)
-                        break
-                    }
-                }
+    private fun setCategorySelection(c : Category) {
+        for (i in 0 until categorySpinner.adapter.count) {
+            if (categorySpinner.adapter.getItem(i) == c.value) {
+                categorySpinner.setSelection(i)
+                break
             }
+        }
     }
 }

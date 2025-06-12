@@ -1,8 +1,12 @@
 package com.atomic_crucible.libord.activities
 
 import android.os.Bundle
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.get
 import com.atomic_crucible.libord.types.Category
 import com.atomic_crucible.libord.R
 
@@ -11,18 +15,21 @@ import com.atomic_crucible.libord.types.EntryType
 import com.atomic_crucible.libord.serialization.JsonConverter
 import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.optional.None
+import com.atomic_crucible.libord.optional.Some
+import com.atomic_crucible.libord.optional.executeIfSet
 import com.atomic_crucible.libord.optional.fromNullable
 import com.atomic_crucible.libord.optional.getOrElse
 import com.atomic_crucible.libord.optional.map
+import com.atomic_crucible.libord.types.Article
 import com.google.gson.reflect.TypeToken
-
-const val EDITED_WORD = 3
 
 class EditWordActivity : AppCompatActivity() {
 
     private lateinit var wordEditText: EditText
     private lateinit var categoryEditText: EditText
     private lateinit var saveButton: Button
+    private lateinit var spinnerEntryType : Spinner
+    private lateinit var spinnerArticle : Spinner
 
     private lateinit var EditedEntry: Entry
 
@@ -33,6 +40,8 @@ class EditWordActivity : AppCompatActivity() {
         wordEditText = findViewById(R.id.editTextWord)
         categoryEditText = findViewById(R.id.editTextCategory)
         saveButton = findViewById(R.id.buttonSave)
+        spinnerEntryType = findViewById(R.id.spinnerEntryType)
+        spinnerArticle = findViewById(R.id.spinnerArticle)
 
         EditedEntry = fromNullable(intent.getStringExtra("ENTRY"))
             .map {
@@ -50,6 +59,19 @@ class EditWordActivity : AppCompatActivity() {
         }
         }))
 
+        populateSpinners()
+
+        spinnerEntryType.setSelection(EntryType.entries.indexOf(EditedEntry.entryType))
+        when(EditedEntry.entryType)
+        {
+            EntryType.Noun -> spinnerArticle.visibility = VISIBLE
+            else -> spinnerArticle.visibility = GONE
+        }
+
+        EditedEntry.article.executeIfSet {
+            spinnerArticle.setSelection(Article.entries.indexOf(it))
+        }
+
         saveButton.setOnClickListener {
             val word = wordEditText.text.toString()
             val category = categoryEditText.text.toString()
@@ -59,14 +81,45 @@ class EditWordActivity : AppCompatActivity() {
                 .map { it.trim() }
                 .map { Category(it) }
 
+            val entryType = EntryType.entries[spinnerEntryType.selectedItemPosition]
+            val article = when (entryType)
+            {
+                EntryType.Noun -> Some(Article.entries[spinnerArticle.selectedItemPosition])
+                else -> None
+            }
+
             if (word.isNotBlank() && category.isNotBlank()) {
                 WordLibrary.updateEntry(EditedEntry ,
-                    Entry(word,categories, EntryType.Noun, None), this)
+                    Entry(word,categories, entryType , article), this)
                 Toast.makeText(this, "Word edited", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
                 Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun populateSpinners() {
+        val entryTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, EntryType.entries)
+        entryTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerEntryType.adapter = entryTypeAdapter
+
+        spinnerEntryType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val entryType = EntryType.entries[position]
+                when (entryType) {
+                    EntryType.Noun -> spinnerArticle.visibility = VISIBLE
+                    else -> spinnerArticle.visibility = GONE
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                spinnerArticle.visibility = GONE
+            }
+        }
+
+        val articleAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, Article.entries)
+        articleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerArticle.adapter = articleAdapter
     }
 }

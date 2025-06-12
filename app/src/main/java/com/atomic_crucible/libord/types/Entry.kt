@@ -9,7 +9,7 @@ data class Category (
 )
 
 enum class EntryType {
-    Noun, Verb, Phrase, None
+    Noun, Verb, Adjective, Phrase, None
 }
 
 enum class Article {

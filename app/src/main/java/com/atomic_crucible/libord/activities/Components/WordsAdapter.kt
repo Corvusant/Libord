@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
@@ -13,6 +15,8 @@ import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.serialization.JsonConverter
 import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.activities.EditWordActivity
+import com.atomic_crucible.libord.optional.executeIfSet
+import com.atomic_crucible.libord.types.EntryType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class WordsAdapter(
@@ -22,6 +26,7 @@ class WordsAdapter(
 
     class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val wordTextView: TextView = itemView.findViewById(R.id.textViewItemWord)
+        val articleTextView: TextView = itemView.findViewById(R.id.textViewArticle)
         val categoryTextView : TextView = itemView.findViewById(R.id.textViewCategory)
         val deleteButton: FloatingActionButton = itemView.findViewById(R.id.buttonDeleteWord)
         val editButton : FloatingActionButton = itemView.findViewById(R.id.buttonEditWord)
@@ -42,6 +47,16 @@ class WordsAdapter(
                 else -> "$acc, ${c.value}"
             }
         })
+
+        when(word.entryType)
+        {
+            EntryType.Noun -> holder.articleTextView.visibility = VISIBLE
+            else -> holder.articleTextView.visibility = GONE
+        }
+
+        word.article.executeIfSet {
+            holder.articleTextView.text = it.toString()
+        }
 
         holder.editButton.setOnClickListener {
             val intent = Intent(context, EditWordActivity::class.java)
