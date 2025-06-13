@@ -1,10 +1,10 @@
 package com.atomic_crucible.libord.serialization
 
-import com.atomic_crucible.libord.optional.None
 import com.atomic_crucible.libord.optional.Optional
 import com.atomic_crucible.libord.optional.fromNullable
 import com.atomic_crucible.libord.optional.getOrElse
 import com.atomic_crucible.libord.optional.map
+import com.atomic_crucible.libord.optional.serialization.getOptional
 import com.atomic_crucible.libord.types.Article
 import com.atomic_crucible.libord.types.Category
 import com.atomic_crucible.libord.types.EntryType
@@ -18,7 +18,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonArray
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.reflect.TypeToken
-
 
 class EntryDeserializer : JsonDeserializer<Entry> {
     override fun deserialize(
@@ -50,21 +49,22 @@ class EntryDeserializer : JsonDeserializer<Entry> {
                 EntryType.None// Use a default if enum is missing or invalid
             }
 
-            val article: Optional<Article> = if (it.has("article") && !it.get("article").isJsonNull) {
-                try {
-                    context.deserialize<Optional<Article>>(it.get("article"),  object : TypeToken<Optional<Article>>() {}.type)
-                } catch (e: Exception) {
-                    None
-                }
-            } else {
-                None
-            }
+            val article: Optional<Article> = it.getOptional(
+                "article",
+                context,
+                object : TypeToken<Optional<Article>>() {}.type)
+
+            val plural: Optional<String> = it.getOptional(
+                "plural",
+                context,
+                object : TypeToken<Optional<String>>() {}.type)
 
             Entry(
                 value,
                 categories,
                 entryType,
-                article)
+                article,
+                plural)
         }
         .getOrElse { ErrorEntry } // find a better fallback here but in case we deserialize garbage we need to know
     }

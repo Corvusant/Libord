@@ -15,6 +15,7 @@ import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.serialization.JsonConverter
 import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.activities.EditWordActivity
+import com.atomic_crucible.libord.extensions.setFromOption
 import com.atomic_crucible.libord.optional.executeIfSet
 import com.atomic_crucible.libord.types.EntryType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,11 +26,12 @@ class WordsAdapter(
 ) : RecyclerView.Adapter<WordsAdapter.WordViewHolder>() {
 
     class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val wordTextView: TextView = itemView.findViewById(R.id.textViewItemWord)
-        val articleTextView: TextView = itemView.findViewById(R.id.textViewArticle)
-        val categoryTextView : TextView = itemView.findViewById(R.id.textViewCategory)
-        val deleteButton: FloatingActionButton = itemView.findViewById(R.id.buttonDeleteWord)
-        val editButton : FloatingActionButton = itemView.findViewById(R.id.buttonEditWord)
+        val textViewEntry: TextView = itemView.findViewById(R.id.textViewItemWord)
+        val textViewArticle: TextView = itemView.findViewById(R.id.textViewArticle)
+        val textViewCategory : TextView = itemView.findViewById(R.id.textViewCategory)
+        val btnDelete: FloatingActionButton = itemView.findViewById(R.id.buttonDeleteWord)
+        val btnEdit : FloatingActionButton = itemView.findViewById(R.id.buttonEditWord)
+        var textViewPlural : TextView = itemView.findViewById(R.id.textViewPlural)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder {
@@ -40,8 +42,8 @@ class WordsAdapter(
 
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
         val word = entries[position]
-        holder.wordTextView.text = word.value
-        holder.categoryTextView.text = word.categories.fold("", {
+        holder.textViewEntry.text = word.value
+        holder.textViewCategory.text = word.categories.fold("", {
             acc, c -> when (acc){
                 "" -> c.value
                 else -> "$acc, ${c.value}"
@@ -50,21 +52,27 @@ class WordsAdapter(
 
         when(word.entryType)
         {
-            EntryType.Noun -> holder.articleTextView.visibility = VISIBLE
-            else -> holder.articleTextView.visibility = GONE
+            EntryType.Noun -> {
+                holder.textViewArticle.visibility = VISIBLE
+                holder.textViewPlural.visibility = VISIBLE
+
+                holder.textViewArticle.setFromOption(word.article)
+                holder.textViewPlural.setFromOption(word.plural)
+
+            }
+            else -> {
+                holder.textViewArticle.visibility = GONE
+                holder.textViewPlural.visibility = GONE
+            }
         }
 
-        word.article.executeIfSet {
-            holder.articleTextView.text = it.toString()
-        }
-
-        holder.editButton.setOnClickListener {
+        holder.btnEdit.setOnClickListener {
             val intent = Intent(context, EditWordActivity::class.java)
             intent.putExtra("ENTRY", JsonConverter.toJson(word))
             startActivity(context, intent, null)
         }
 
-        holder.deleteButton.setOnClickListener {
+        holder.btnDelete.setOnClickListener {
             WordLibrary.deleteWord(word, context)
             entries.removeAt(position)
             notifyItemRemoved(position)

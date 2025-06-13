@@ -25,7 +25,7 @@
             android:id="@+id/editTextCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="2dp"
             android:hint="@string/category" />
 
         <Spinner
@@ -50,6 +50,13 @@
             android:id="@+id/spinnerArticle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/editTextPlural"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:hint="@string/plural" />
 
     </LinearLayout>
 

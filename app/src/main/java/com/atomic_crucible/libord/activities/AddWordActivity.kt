@@ -18,9 +18,10 @@ import com.atomic_crucible.libord.optional.Some
 
 class AddWordActivity : AppCompatActivity() {
 
-    private lateinit var wordEditText: EditText
-    private lateinit var categoryEditText: EditText
-    private lateinit var saveButton: Button
+    private lateinit var editTextEntry: EditText
+    private lateinit var editTextCategory: EditText
+    private lateinit var editTextPlural: EditText
+    private lateinit var btnSave: Button
     private lateinit var spinnerEntryType : Spinner
     private lateinit var spinnerArticle : Spinner
 
@@ -28,17 +29,18 @@ class AddWordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_word)
 
-        wordEditText = findViewById(R.id.editTextWord)
-        categoryEditText = findViewById(R.id.editTextCategory)
-        saveButton = findViewById(R.id.buttonSave)
+        editTextEntry = findViewById(R.id.editTextWord)
+        editTextCategory = findViewById(R.id.editTextCategory)
+        btnSave = findViewById(R.id.buttonSave)
         spinnerEntryType = findViewById(R.id.spinnerEntryType)
         spinnerArticle = findViewById(R.id.spinnerArticle)
+        editTextPlural = findViewById(R.id.editTextPlural)
 
         populateSpinners()
 
-        saveButton.setOnClickListener {
-            val word = wordEditText.text.toString()
-            val category = categoryEditText.text.toString()
+        btnSave.setOnClickListener {
+            val word = editTextEntry.text.toString()
+            val category = editTextCategory.text.toString()
 
             val categories = category.splitToSequence(",")
                 .toList()
@@ -50,13 +52,20 @@ class AddWordActivity : AppCompatActivity() {
 
                 val article = when (entryType) {
                     EntryType.Noun -> Some(Article.entries[spinnerArticle.selectedItemPosition])
-                    else-> None}
+                    else-> None
+                }
+
+                val plural = when (entryType) {
+                    EntryType.Noun -> Some(editTextPlural.text.toString())
+                    else-> None
+                }
 
                 val newEntry = Entry(
                     word,
                     categories,
                     entryType,
-                    article)
+                    article,
+                    plural)
 
                 WordLibrary.addEntry(newEntry, this)
                 Toast.makeText(this, "Word Added", Toast.LENGTH_SHORT).show()
@@ -76,13 +85,20 @@ class AddWordActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val entryType = EntryType.entries[position]
                 when (entryType) {
-                    EntryType.Noun -> spinnerArticle.visibility = VISIBLE
-                    else -> spinnerArticle.visibility = GONE
+                    EntryType.Noun -> {
+                        spinnerArticle.visibility = VISIBLE
+                        editTextPlural.visibility = VISIBLE
+                    }
+                    else -> {
+                        spinnerArticle.visibility = GONE
+                        editTextPlural.visibility = GONE
+                    }
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 spinnerArticle.visibility = GONE
+                editTextPlural.visibility = GONE
             }
         }
 

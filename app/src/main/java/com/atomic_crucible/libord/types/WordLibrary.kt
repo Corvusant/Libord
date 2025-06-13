@@ -120,7 +120,7 @@ object WordLibrary {
             -1 -> return
             else -> entries[index] = newValue
         }
-
+        save(context, JsonConverter)
     }
 
 }

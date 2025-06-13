@@ -13,4 +13,10 @@
     <string name="next">Neues Wort</string>
     <string name="no_word_in_library">Die Wortbibliothek is leer</string>
     <string name="edit_word">Wort Editieren</string>
+    <string name="plural">Plural</string>
+    <string name="entryType_Noun">Nomen</string>
+    <string name="entryType_verb">Verb</string>
+    <string name="entryType_adjective">Adjetiv</string>
+    <string name="entryType_phrase">Phrase</string>
+    <string name="entryType_none">None</string>
 </resources>

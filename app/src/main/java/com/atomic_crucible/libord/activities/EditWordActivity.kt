@@ -6,7 +6,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
 import com.atomic_crucible.libord.types.Category
 import com.atomic_crucible.libord.R
 
@@ -25,9 +24,10 @@ import com.google.gson.reflect.TypeToken
 
 class EditWordActivity : AppCompatActivity() {
 
-    private lateinit var wordEditText: EditText
-    private lateinit var categoryEditText: EditText
-    private lateinit var saveButton: Button
+    private lateinit var editTextEntry: EditText
+    private lateinit var editTextCategory: EditText
+    private lateinit var editTextPlural : EditText
+    private lateinit var btnSave: Button
     private lateinit var spinnerEntryType : Spinner
     private lateinit var spinnerArticle : Spinner
 
@@ -37,9 +37,10 @@ class EditWordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_word)
 
-        wordEditText = findViewById(R.id.editTextWord)
-        categoryEditText = findViewById(R.id.editTextCategory)
-        saveButton = findViewById(R.id.buttonSave)
+        editTextEntry = findViewById(R.id.editTextWord)
+        editTextCategory = findViewById(R.id.editTextCategory)
+        editTextPlural = findViewById(R.id.editTextPlural)
+        btnSave = findViewById(R.id.buttonSave)
         spinnerEntryType = findViewById(R.id.spinnerEntryType)
         spinnerArticle = findViewById(R.id.spinnerArticle)
 
@@ -51,8 +52,8 @@ class EditWordActivity : AppCompatActivity() {
             }
             .getOrElse { WordLibrary.any() }
 
-        wordEditText.setText(EditedEntry.value)
-        categoryEditText.setText( EditedEntry.categories.fold("", {
+        editTextEntry.setText(EditedEntry.value)
+        editTextCategory.setText( EditedEntry.categories.fold("", {
                 acc, c -> when (acc){
             "" -> c.value
             else -> "$acc, ${c.value}"
@@ -72,9 +73,9 @@ class EditWordActivity : AppCompatActivity() {
             spinnerArticle.setSelection(Article.entries.indexOf(it))
         }
 
-        saveButton.setOnClickListener {
-            val word = wordEditText.text.toString()
-            val category = categoryEditText.text.toString()
+        btnSave.setOnClickListener {
+            val word = editTextEntry.text.toString()
+            val category = editTextCategory.text.toString()
 
             val categories = category.splitToSequence(",")
                 .toList()
@@ -88,9 +89,16 @@ class EditWordActivity : AppCompatActivity() {
                 else -> None
             }
 
-            if (word.isNotBlank() && category.isNotBlank()) {
+            val plural = when (entryType)
+            {
+                EntryType.Noun -> Some(editTextPlural.text.toString())
+                else -> None
+            }
+
+            if (word.isNotBlank() && category.isNotBlank() && entryType != EntryType.None) {
                 WordLibrary.updateEntry(EditedEntry ,
-                    Entry(word,categories, entryType , article), this)
+                    Entry(word,categories, entryType , article, plural),
+                    this)
                 Toast.makeText(this, "Word edited", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
@@ -108,13 +116,20 @@ class EditWordActivity : AppCompatActivity() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val entryType = EntryType.entries[position]
                 when (entryType) {
-                    EntryType.Noun -> spinnerArticle.visibility = VISIBLE
-                    else -> spinnerArticle.visibility = GONE
+                    EntryType.Noun -> {
+                        spinnerArticle.visibility = VISIBLE
+                        editTextPlural.visibility = VISIBLE
+                    }
+                    else -> {
+                        spinnerArticle.visibility = GONE
+                        editTextPlural.visibility = GONE
+                    }
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 spinnerArticle.visibility = GONE
+                editTextPlural.visibility = GONE
             }
         }
 

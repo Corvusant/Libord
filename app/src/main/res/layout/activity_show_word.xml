@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="15dp"
+
             android:text="Der"
             android:textSize="38sp"
             android:textStyle="bold"
@@ -32,12 +32,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="32dp"
             android:text="Super long test value I use to determine how very long words/ phrases look"
             android:textSize="38sp"
             android:textStyle="bold"
-
             tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textViewPLural"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="15dp"
+            android:text=", e"
+            android:textSize="38sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
     </LinearLayout>
 
     <Button
