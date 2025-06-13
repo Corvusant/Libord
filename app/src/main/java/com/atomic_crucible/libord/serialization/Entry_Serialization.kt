@@ -43,7 +43,7 @@ class EntryDeserializer : JsonDeserializer<Entry> {
             val entryType = try {
                 when(val entryTypeStr = it.get("entryType")?.asString)
                 {
-                    null ->  EntryType.Noun
+                    null ->  EntryType.None
                     else -> EntryType.valueOf(entryTypeStr)
                 }
             } catch (e: Exception) {
