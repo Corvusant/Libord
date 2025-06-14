@@ -2,6 +2,7 @@ package com.atomic_crucible.libord.activities
 
 import android.os.Bundle
 import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import com.atomic_crucible.libord.extensions.setFromOption
 import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.optional.*
+import com.atomic_crucible.libord.types.Article
 import com.atomic_crucible.libord.types.EntryType
 
 class ShowWordActivity : AppCompatActivity() {
@@ -48,13 +50,25 @@ class ShowWordActivity : AppCompatActivity() {
 
             when(it.entryType)
             {
-                EntryType.Noun ->
-                {
-                    textViewArticle.setFromOption(it.article)
+                EntryType.Noun -> {
+                    it.article.flatten(
+                        { a ->
+                            when(a) {
+                                Article.kein -> textViewArticle.visibility = GONE
+                                else -> {
+                                    textViewArticle.visibility = VISIBLE
+                                    textViewArticle.text  = a.toString()
+                                }
+                            }
+                        },
+                        {
+                            textViewArticle.visibility = GONE
+                        }
+                    )
+
                     textViewPlural.setFromOption(it.plural)
                 }
-                else ->
-                {
+                else -> {
                     textViewArticle.visibility = GONE
                     textViewPlural.visibility = GONE
                 }

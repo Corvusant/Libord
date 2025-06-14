@@ -32,7 +32,8 @@ fun EntryType.getLocalizedName(c : Context) : String =
 enum class Article {
     der,
     die,
-    das
+    das,
+    kein
 }
 
 val ErrorEntry : Entry = Entry("##ERROR##", listOf(), EntryType.None, None, None)

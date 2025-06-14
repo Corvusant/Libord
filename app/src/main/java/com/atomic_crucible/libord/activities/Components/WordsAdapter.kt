@@ -17,6 +17,8 @@ import com.atomic_crucible.libord.types.WordLibrary
 import com.atomic_crucible.libord.activities.EditWordActivity
 import com.atomic_crucible.libord.extensions.setFromOption
 import com.atomic_crucible.libord.optional.executeIfSet
+import com.atomic_crucible.libord.optional.flatten
+import com.atomic_crucible.libord.types.Article
 import com.atomic_crucible.libord.types.EntryType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -56,7 +58,21 @@ class WordsAdapter(
                 holder.textViewArticle.visibility = VISIBLE
                 holder.textViewPlural.visibility = VISIBLE
 
-                holder.textViewArticle.setFromOption(word.article)
+                word.article.flatten(
+                    {
+                        when(it) {
+                            Article.kein -> holder.textViewArticle.visibility = GONE
+                            else -> {
+                                holder.textViewArticle.visibility = VISIBLE
+                                holder.textViewArticle.text  = it.toString()
+                            }
+                        }
+                    },
+                    {
+                        holder.textViewArticle.visibility = GONE
+                    }
+                )
+
                 holder.textViewPlural.setFromOption(word.plural)
 
             }
