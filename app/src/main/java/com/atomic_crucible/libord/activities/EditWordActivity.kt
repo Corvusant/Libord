@@ -8,6 +8,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.atomic_crucible.libord.types.Category
 import com.atomic_crucible.libord.R
+import com.atomic_crucible.libord.extensions.setFromOption
 
 import com.atomic_crucible.libord.types.Entry
 import com.atomic_crucible.libord.types.EntryType
@@ -31,7 +32,7 @@ class EditWordActivity : AppCompatActivity() {
     private lateinit var spinnerEntryType : Spinner
     private lateinit var spinnerArticle : Spinner
 
-    private lateinit var EditedEntry: Entry
+    private lateinit var editedEntry: Entry
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class EditWordActivity : AppCompatActivity() {
         spinnerEntryType = findViewById(R.id.spinnerEntryType)
         spinnerArticle = findViewById(R.id.spinnerArticle)
 
-        EditedEntry = fromNullable(intent.getStringExtra("ENTRY"))
+        editedEntry = fromNullable(intent.getStringExtra("ENTRY"))
             .map {
                 JsonConverter.fromJson<Entry>(
                     it,
@@ -52,8 +53,8 @@ class EditWordActivity : AppCompatActivity() {
             }
             .getOrElse { WordLibrary.any() }
 
-        editTextEntry.setText(EditedEntry.value)
-        editTextCategory.setText( EditedEntry.categories.fold("", {
+        editTextEntry.setText(editedEntry.value)
+        editTextCategory.setText( editedEntry.categories.fold("", {
                 acc, c -> when (acc){
             "" -> c.value
             else -> "$acc, ${c.value}"
@@ -62,15 +63,19 @@ class EditWordActivity : AppCompatActivity() {
 
         populateSpinners()
 
-        spinnerEntryType.setSelection(EntryType.entries.indexOf(EditedEntry.entryType))
-        when(EditedEntry.entryType)
+        spinnerEntryType.setSelection(EntryType.entries.indexOf(editedEntry.entryType))
+        when(editedEntry.entryType)
         {
-            EntryType.Noun -> spinnerArticle.visibility = VISIBLE
-            else -> spinnerArticle.visibility = GONE
-        }
-
-        EditedEntry.article.executeIfSet {
-            spinnerArticle.setSelection(Article.entries.indexOf(it))
+            EntryType.Noun ->
+            {
+                spinnerArticle.setFromOption(editedEntry.article)
+                editTextPlural.setFromOption(editedEntry.plural)
+            }
+            else ->
+            {
+                spinnerArticle.visibility = GONE
+                editTextPlural.visibility = GONE
+            }
         }
 
         btnSave.setOnClickListener {
@@ -96,7 +101,7 @@ class EditWordActivity : AppCompatActivity() {
             }
 
             if (word.isNotBlank() && category.isNotBlank() && entryType != EntryType.None) {
-                WordLibrary.updateEntry(EditedEntry ,
+                WordLibrary.updateEntry(editedEntry ,
                     Entry(word,categories, entryType , article, plural),
                     this)
                 Toast.makeText(this, "Word edited", Toast.LENGTH_SHORT).show()

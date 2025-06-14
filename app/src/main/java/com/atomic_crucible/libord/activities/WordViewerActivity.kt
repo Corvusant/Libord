@@ -32,7 +32,8 @@ class WordViewerActivity : AppCompatActivity() {
     private lateinit var deleteAllButton: Button
     private lateinit var exportButton : Button
     private lateinit var importButton : Button
-    private lateinit var adapter: WordsAdapter
+    private lateinit var wordsAdapter: WordsAdapter
+    private lateinit var categoriesAdapter: ArrayAdapter<String>
 
     private var currentCategory: Category = CATEGORY_ALL
 
@@ -72,7 +73,6 @@ class WordViewerActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK)
         {
-
             when(requestCode)
             {
                  WRITE_LIB_FILE -> data?.data?.also {
@@ -114,11 +114,10 @@ class WordViewerActivity : AppCompatActivity() {
     }
 
     private fun setupCategorySpinner() {
-        val categories =
-            mutableListOf(CATEGORY_ALL.value) + WordLibrary.getCategories().map { it.value }
-        val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
-        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = adapterSpinner
+        val allCategories = mutableListOf(CATEGORY_ALL) + WordLibrary.getCategories()
+        categoriesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, allCategories.map { it.value })
+        categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        categorySpinner.adapter = categoriesAdapter
 
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -127,7 +126,7 @@ class WordViewerActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                currentCategory = Category(categories[position])
+                currentCategory = allCategories[position]
                 updateWordList(currentCategory)
                 WordLibrary.setLastSelectedCategory(Some(currentCategory))
             }
@@ -139,20 +138,20 @@ class WordViewerActivity : AppCompatActivity() {
 
         WordLibrary.onCategoryCleared = { removedCategory ->
             when (removedCategory) {
-                CATEGORY_ALL -> adapterSpinner.clear()
-                else -> adapterSpinner.remove(removedCategory.value)
+                CATEGORY_ALL -> categoriesAdapter.clear()
+                else -> categoriesAdapter.remove(removedCategory.value)
             }
         }
 
         WordLibrary.onCategoryAdded = {
-            addedCategory -> adapterSpinner.add(addedCategory.value)
+            addedCategory -> categoriesAdapter.add(addedCategory.value)
         }
     }
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = WordsAdapter(mutableListOf(), this)
-        recyclerView.adapter = adapter
+        wordsAdapter = WordsAdapter(mutableListOf(), this)
+        recyclerView.adapter = wordsAdapter
         updateWordList(CATEGORY_ALL)
     }
 
@@ -161,9 +160,30 @@ class WordViewerActivity : AppCompatActivity() {
             CATEGORY_ALL -> WordLibrary.getAllWords()
             else -> WordLibrary.getWordsByCategory(category)
         }
-        adapter.updateWords(words)
+        wordsAdapter.updateWords(words)
     }
 
+    fun updateCategorySpinner()
+    {
+        val categories = categoriesAdapter.let {
+            var c :MutableList<Category> = mutableListOf()
+            for (i in 0 until it.count) {
+               c.add(Category(it.getItem(i).toString()))
+            }
+            c.toList()
+        }
+
+        val allCategories = mutableListOf(CATEGORY_ALL) + WordLibrary.getCategories()
+        val newCategories = allCategories.subtract(categories.toSet())
+        val removedItems = categories.subtract(allCategories.toSet())
+
+        val adapter = categorySpinner.adapter as? ArrayAdapter<String>
+        for(item in removedItems.map { it.value }) {
+            adapter?.remove(item)
+        }
+        adapter?.addAll(newCategories.map { it.value })
+        adapter?.notifyDataSetChanged()
+    }
 
     override fun onPostResume() {
         super.onPostResume()
@@ -177,6 +197,8 @@ class WordViewerActivity : AppCompatActivity() {
                 setCategorySelection(CATEGORY_ALL)
                 updateWordList(CATEGORY_ALL)
             })
+
+        updateCategorySpinner()
     }
 
     private fun setCategorySelection(c : Category) {

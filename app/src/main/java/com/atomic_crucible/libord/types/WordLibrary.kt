@@ -43,7 +43,7 @@ object WordLibrary {
     {
         val categories = getCategories()
         val newCategories = getCategoriesFromWords(inEntries)
-        val addedCategories = categories.union(newCategories).subtract(categories.toSet())
+        val addedCategories = newCategories.subtract(categories.toSet())
 
         entries = entries.union(inEntries)
             .toMutableList()
