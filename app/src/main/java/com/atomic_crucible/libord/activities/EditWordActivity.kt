@@ -21,6 +21,7 @@ import com.atomic_crucible.libord.optional.fromNullable
 import com.atomic_crucible.libord.optional.getOrElse
 import com.atomic_crucible.libord.optional.map
 import com.atomic_crucible.libord.types.Article
+import com.atomic_crucible.libord.types.getLocalizedName
 import com.google.gson.reflect.TypeToken
 
 class EditWordActivity : AppCompatActivity() {
@@ -113,7 +114,7 @@ class EditWordActivity : AppCompatActivity() {
     }
 
     private fun populateSpinners() {
-        val entryTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, EntryType.entries)
+        val entryTypeAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, EntryType.entries.map { it.getLocalizedName(this) })
         entryTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerEntryType.adapter = entryTypeAdapter
 
