@@ -24,11 +24,14 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
         android:orientation="vertical"
         android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LibrHeadline">
+        app:layout_constraintTop_toBottomOf="@+id/LibrHeadline"
+        app:layout_constraintVertical_bias="0.0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,8 +43,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:minHeight="30dp"
-                android:layout_weight="5"/>
+                android:layout_weight="5"
+                android:minHeight="30dp" />
 
             <Button
                 android:id="@+id/buttonDeleteAll"
@@ -49,8 +52,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
-                android:text="@string/delete_all_in_category"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="@string/delete_all_in_category" />
 
         </LinearLayout>
 
@@ -64,6 +67,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
