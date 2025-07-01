@@ -1,98 +1,143 @@
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/LibrHeadline"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:text="@string/Libord"
-        android:textAlignment="center"
-        android:textSize="36sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Library" />
-
-    <LinearLayout
+    <!-- Main Layout -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom="15dp"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/LibrHeadline"
-        app:layout_constraintVertical_bias="0.0">
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/Header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="15dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/LibrHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/Libord"
+                android:textAlignment="center"
+                android:textSize="36sp"
+                tools:text="Library" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:orientation="vertical"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Header"
+            app:layout_constraintVertical_bias="0.0">
 
-
-            <Spinner
-                android:id="@+id/spinnerFilterCategory"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewWords"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_weight="5"
-                android:minHeight="30dp" />
-
-            <Button
-                android:id="@+id/buttonDeleteAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_weight="1"
-                android:text="@string/delete_all_in_category" />
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1" />
 
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewWords"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/FilterContainer"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:background="?attr/colorBackgroundFloating"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:translationX="-235dp">
+
+        <LinearLayout
+            android:id="@+id/filters"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="80dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/linearLayout5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+                <Spinner
+                    android:id="@+id/spinnerFilterCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:dropDownWidth="match_parent"
+                    android:minHeight="30dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <Button
+                    android:id="@+id/exportButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/Lib_export" />
+
+                <Button
+                    android:id="@+id/importButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/Lib_import" />
+
+                <Button
+                    android:id="@+id/buttonDeleteAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/delete_all_in_category" />
+
+            </LinearLayout>
+        </LinearLayout>
+
 
         <Button
-            android:id="@+id/exportButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:text="@string/Lib_export" />
-
-        <Button
-            android:id="@+id/importButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
-            android:layout_marginBottom="15dp"
-            android:text="@string/Lib_import" />
+            android:id="@+id/toggleFilters"
+            android:layout_width="39dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:cornerRadius="0dp" />
 
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

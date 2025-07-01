@@ -27,30 +27,35 @@ import java.io.FileOutputStream
 
 class WordViewerActivity : AppCompatActivity() {
 
-    private lateinit var categorySpinner: Spinner
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var deleteAllButton: Button
-    private lateinit var exportButton : Button
-    private lateinit var importButton : Button
+    private lateinit var spinnerCategory: Spinner
+    private lateinit var rvWords: RecyclerView
+    private lateinit var btnDeleteAll: Button
+    private lateinit var btnExport : Button
+    private lateinit var btnImport : Button
+    private lateinit var btnFilterMenuToggle : Button
     private lateinit var wordsAdapter: WordsAdapter
     private lateinit var categoriesAdapter: ArrayAdapter<String>
+    private lateinit var filterContainer: LinearLayout
 
     private var currentCategory: Category = CATEGORY_ALL
+    private var filtersShown = false;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_viewer)
 
-        categorySpinner = findViewById(R.id.spinnerFilterCategory)
-        recyclerView = findViewById(R.id.recyclerViewWords)
-        deleteAllButton = findViewById(R.id.buttonDeleteAll)
-        exportButton = findViewById(R.id.exportButton)
-        importButton = findViewById(R.id.importButton)
+        spinnerCategory = findViewById(R.id.spinnerFilterCategory)
+        rvWords = findViewById(R.id.recyclerViewWords)
+        btnDeleteAll = findViewById(R.id.buttonDeleteAll)
+        btnExport = findViewById(R.id.exportButton)
+        btnImport = findViewById(R.id.importButton)
+        btnFilterMenuToggle = findViewById(R.id.toggleFilters)
+        filterContainer = findViewById(R.id.FilterContainer)
 
         setupCategorySpinner()
         setupRecyclerView()
 
-        deleteAllButton.setOnClickListener {
+        btnDeleteAll.setOnClickListener {
             if (currentCategory == CATEGORY_ALL) {
                 WordLibrary.getCategories()
                 .forEach { WordLibrary.deleteAllInCategory(it,this) }
@@ -62,11 +67,15 @@ class WordViewerActivity : AppCompatActivity() {
             }
         }
 
-        exportButton.setOnClickListener {
+        btnExport.setOnClickListener {
             createFile(this)
         }
-        importButton.setOnClickListener {
+        btnImport.setOnClickListener {
             openFile(this)
+        }
+
+        btnFilterMenuToggle.setOnClickListener {
+            toggleFilters()
         }
     }
 
@@ -117,9 +126,9 @@ class WordViewerActivity : AppCompatActivity() {
         val allCategories = mutableListOf(CATEGORY_ALL) + WordLibrary.getCategories()
         categoriesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, allCategories.map { it.value })
         categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = categoriesAdapter
+        spinnerCategory.adapter = categoriesAdapter
 
-        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -149,9 +158,9 @@ class WordViewerActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        rvWords.layoutManager = LinearLayoutManager(this)
         wordsAdapter = WordsAdapter(mutableListOf(), this)
-        recyclerView.adapter = wordsAdapter
+        rvWords.adapter = wordsAdapter
         updateWordList(CATEGORY_ALL)
     }
 
@@ -177,7 +186,7 @@ class WordViewerActivity : AppCompatActivity() {
         val newCategories = allCategories.subtract(categories.toSet())
         val removedItems = categories.subtract(allCategories.toSet())
 
-        val adapter = categorySpinner.adapter as? ArrayAdapter<String>
+        val adapter = spinnerCategory.adapter as? ArrayAdapter<String>
         for(item in removedItems.map { it.value }) {
             adapter?.remove(item)
         }
@@ -202,10 +211,31 @@ class WordViewerActivity : AppCompatActivity() {
     }
 
     private fun setCategorySelection(c : Category) {
-        for (i in 0 until categorySpinner.adapter.count) {
-            if (categorySpinner.adapter.getItem(i) == c.value) {
-                categorySpinner.setSelection(i)
+        for (i in 0 until spinnerCategory.adapter.count) {
+            if (spinnerCategory.adapter.getItem(i) == c.value) {
+                spinnerCategory.setSelection(i)
                 break
+            }
+        }
+    }
+
+    private fun toggleFilters()
+    {
+        filtersShown = !filtersShown
+        when (filtersShown)
+        {
+            true -> {
+                filterContainer.animate()
+                    .translationX(0f)
+                    .alpha(1f)
+                    .setDuration(250)
+
+            }
+            else-> {
+                filterContainer.animate()
+                    .translationX(-filterContainer.width.toFloat() + btnFilterMenuToggle.width/2)
+                    .alpha(0.8f)
+                    .setDuration(250)
             }
         }
     }
